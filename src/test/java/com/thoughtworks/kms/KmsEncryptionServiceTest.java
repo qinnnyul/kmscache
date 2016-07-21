@@ -13,11 +13,6 @@ public class KmsEncryptionServiceTest
 {
     private KmsEncryptionService classUnderTest;
 
-    String mockedEncryptedKey = "\u0007\u00010\u001E\u0006\t`�H\u0001e\u0003\u0004\u0001" +
-            ".0\u0011\u0004\f4v\u0016\u0000\u0017£>�e�x\u0002\u0001\u0010�+\u0010\u0004\u001EO��S�\u0007`#�2��%��,+�%��\u001C��0�Q\u001B";
-    String cipherText = "yka5nqvgFmANJLNqAVTuZQ";
-
-
     @Before
     public void setUp() throws Exception
     {
@@ -31,13 +26,17 @@ public class KmsEncryptionServiceTest
     }
 
     @Test
-    public void shouldEncryptDataWithKms() throws Exception
+    public void shouldEncryptAndDecryptDataWithKms() throws Exception
     {
         // when
         EnvelopeEncryptedMessage envelopeEncryptedMessage = classUnderTest.encrypt("hello world");
         // then
         assertNotNull(envelopeEncryptedMessage.getCiphertext());
         assertNotNull(envelopeEncryptedMessage.getEncryptedKey());
+
+        String plainText = classUnderTest.decrypt(envelopeEncryptedMessage);
+
+        assertThat(plainText, is("hello world"));
     }
 
     @Test
@@ -52,17 +51,15 @@ public class KmsEncryptionServiceTest
     }
 
     @Test
-    public void shouldDecryptDataWithKmsCache() throws Exception
+    public void shouldUsingCacheKeyToDecryptData() throws Exception
     {
+        // given
+        EnvelopeEncryptedMessage envelopeEncryptedMessage = classUnderTest.encrypt("say hello");
 
-        EnvelopeEncryptedMessage envelopeEncryptedMessage = new EnvelopeEncryptedMessage();
-        envelopeEncryptedMessage.setCiphertext(cipherText);
-        envelopeEncryptedMessage.setEncryptedKey(mockedEncryptedKey.getBytes());
-
+        String result1 = classUnderTest.decrypt(envelopeEncryptedMessage);
+        String result2 = classUnderTest.decrypt(envelopeEncryptedMessage);
         // when
-        String plainText = classUnderTest.decrypt(envelopeEncryptedMessage);
+        assertThat(result1.equals(result2), is(true));
 
-        // then
-        assertThat(plainText, is("hello world"));
     }
 }

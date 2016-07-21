@@ -40,7 +40,7 @@ public class KmsEncryptionService
     public EnvelopeEncryptedMessage encrypt(String plainText) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException,
             NoSuchAlgorithmException, NoSuchPaddingException
     {
-        if (secretKey == null || encryptedSecretKey == null){
+        if (secretKey == null || encryptedSecretKey == null) {
             GenerateDataKeyResult generateDataKeyResult = generateDataKey();
             secretKey = generateDataKeyResult.getPlaintext().array();
             encryptedSecretKey = generateDataKeyResult.getCiphertextBlob().array();
@@ -49,8 +49,8 @@ public class KmsEncryptionService
     }
 
 
-    private EnvelopeEncryptedMessage encryptMessage(String plainText) throws NoSuchPaddingException, NoSuchAlgorithmException,
-            InvalidKeyException, BadPaddingException, IllegalBlockSizeException
+    private EnvelopeEncryptedMessage encryptMessage(String plainText) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
+            BadPaddingException, IllegalBlockSizeException
     {
         Cipher cipher = Cipher.getInstance(AES);
         cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(secretKey, AES));
@@ -75,7 +75,7 @@ public class KmsEncryptionService
     public String decrypt(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws NoSuchAlgorithmException, BadPaddingException,
             NoSuchPaddingException, IllegalBlockSizeException, InvalidKeyException
     {
-        if (encryptedSecretKey == null || !Arrays.equals(envelopeEncryptedMessage.getEncryptedKey(), encryptedSecretKey)){
+        if (encryptedSecretKey == null || !Arrays.equals(envelopeEncryptedMessage.getEncryptedKey(), encryptedSecretKey)) {
             DecryptResult decryptResult = decryptKey(envelopeEncryptedMessage);
             secretKey = decryptResult.getPlaintext().array();
             encryptedSecretKey = envelopeEncryptedMessage.getEncryptedKey();
@@ -83,16 +83,17 @@ public class KmsEncryptionService
         return decryptMessage(envelopeEncryptedMessage);
     }
 
-    private String decryptMessage(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException
+    private String decryptMessage(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws InvalidKeyException, NoSuchPaddingException,
+            NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException
     {
         byte[] decode = Base64.getDecoder().decode(envelopeEncryptedMessage.getCiphertext());
         Cipher cipher = Cipher.getInstance(AES);
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secretKey, AES));
-        byte[] bytes = cipher.doFinal(decode);
-        return Arrays.toString(bytes);
+        return new String(cipher.doFinal(decode));
     }
 
-    private DecryptResult decryptKey(final EnvelopeEncryptedMessage envelope) {
+    private DecryptResult decryptKey(final EnvelopeEncryptedMessage envelope)
+    {
         ByteBuffer encryptedKey = ByteBuffer.wrap(envelope.getEncryptedKey());
         DecryptRequest decryptRequest = new DecryptRequest().withCiphertextBlob(encryptedKey);
         return awskmsClient.decrypt(decryptRequest);
