@@ -9,9 +9,9 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-public class KmsEncryptionServiceTest
+public class EnvelopeEncryptionServiceTest
 {
-    private KmsEncryptionService classUnderTest;
+    private EnvelopeEncryptionService classUnderTest;
 
     @Before
     public void setUp() throws Exception
@@ -21,7 +21,7 @@ public class KmsEncryptionServiceTest
 
         String kmsKeyId = "arn:aws:kms:ap-southeast-2:669606450274:key/b8b8f314-f55d-41e8-a8fe-b19a82f2201a";
 
-        classUnderTest = new KmsEncryptionService(awskmsClient, kmsKeyId);
+        classUnderTest = new EnvelopeEncryptionService(awskmsClient, kmsKeyId);
 
     }
 
@@ -31,7 +31,7 @@ public class KmsEncryptionServiceTest
         // when
         EnvelopeEncryptedMessage envelopeEncryptedMessage = classUnderTest.encrypt("hello world");
         // then
-        assertNotNull(envelopeEncryptedMessage.getCiphertext());
+        assertNotNull(envelopeEncryptedMessage.getEncryptedMessage());
         assertNotNull(envelopeEncryptedMessage.getEncryptedKey());
 
         String plainText = classUnderTest.decrypt(envelopeEncryptedMessage);

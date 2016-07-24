@@ -4,7 +4,7 @@ public final class EnvelopeEncryptedMessage
 {
 
     private byte[] encryptedKey;
-    private String ciphertext;
+    private String encryptedMessage;
 
     public byte[] getEncryptedKey() {
         return encryptedKey;
@@ -14,12 +14,12 @@ public final class EnvelopeEncryptedMessage
         this.encryptedKey = encryptedKey;
     }
 
-    public void setCiphertext(String ciphertext) {
-        this.ciphertext = ciphertext;
+    public void setEncryptedMessage(String encryptedMessage) {
+        this.encryptedMessage = encryptedMessage;
     }
 
-    public String getCiphertext() {
-        return ciphertext;
+    public String getEncryptedMessage() {
+        return encryptedMessage;
     }
 
 
