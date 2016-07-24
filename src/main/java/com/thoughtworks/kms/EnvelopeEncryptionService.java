@@ -52,13 +52,12 @@ public class EnvelopeEncryptionService
     public String decrypt(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws NoSuchAlgorithmException, BadPaddingException,
             NoSuchPaddingException, IllegalBlockSizeException, InvalidKeyException
     {
-        if (encryptedDataKey == null || !Arrays.equals(envelopeEncryptedMessage.getEncryptedKey(), encryptedDataKey)) {
-            DecryptResult decryptResult = decryptDataKey(envelopeEncryptedMessage);
-            dataKey = decryptResult.getPlaintext().array();
-            encryptedDataKey = envelopeEncryptedMessage.getEncryptedKey();
+        if (isDataKeyChangedOrEmpty(envelopeEncryptedMessage)) {
+            return decryptMessageInSync(envelopeEncryptedMessage);
         }
         return decryptMessage(envelopeEncryptedMessage);
     }
+
 
     private EnvelopeEncryptedMessage encryptMessage(String plainText) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException
@@ -83,6 +82,15 @@ public class EnvelopeEncryptionService
 
     }
 
+    private synchronized String decryptMessageInSync(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws InvalidKeyException, NoSuchPaddingException,
+            NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException
+    {
+        DecryptResult decryptResult = decryptDataKey(envelopeEncryptedMessage);
+        dataKey = decryptResult.getPlaintext().array();
+        encryptedDataKey = envelopeEncryptedMessage.getEncryptedKey();
+        return decryptMessage(envelopeEncryptedMessage);
+    }
+
 
     private String decryptMessage(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws InvalidKeyException, NoSuchPaddingException,
             NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException
@@ -99,4 +107,10 @@ public class EnvelopeEncryptionService
         DecryptRequest decryptRequest = new DecryptRequest().withCiphertextBlob(encryptedKey);
         return awskms.decrypt(decryptRequest);
     }
+
+    private boolean isDataKeyChangedOrEmpty(EnvelopeEncryptedMessage envelopeEncryptedMessage)
+    {
+        return encryptedDataKey == null || !Arrays.equals(envelopeEncryptedMessage.getEncryptedKey(), encryptedDataKey);
+    }
+
 }
