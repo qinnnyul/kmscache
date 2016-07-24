@@ -26,9 +26,9 @@ public class EnvelopeEncryptionService
 
     private final String kmsKeyId;
 
-    private byte[] dataKey;
+    private volatile byte[] dataKey;
 
-    private byte[] encryptedDataKey;
+    private volatile byte[] encryptedDataKey;
 
     public EnvelopeEncryptionService(final AWSKMS awskms, final String kmsKeyId)
     {
@@ -53,7 +53,7 @@ public class EnvelopeEncryptionService
             NoSuchPaddingException, IllegalBlockSizeException, InvalidKeyException
     {
         if (encryptedDataKey == null || !Arrays.equals(envelopeEncryptedMessage.getEncryptedKey(), encryptedDataKey)) {
-            DecryptResult decryptResult = decryptKey(envelopeEncryptedMessage);
+            DecryptResult decryptResult = decryptDataKey(envelopeEncryptedMessage);
             dataKey = decryptResult.getPlaintext().array();
             encryptedDataKey = envelopeEncryptedMessage.getEncryptedKey();
         }
@@ -93,7 +93,7 @@ public class EnvelopeEncryptionService
         return new String(cipher.doFinal(decode));
     }
 
-    private DecryptResult decryptKey(final EnvelopeEncryptedMessage envelope)
+    private DecryptResult decryptDataKey(final EnvelopeEncryptedMessage envelope)
     {
         ByteBuffer encryptedKey = ByteBuffer.wrap(envelope.getEncryptedKey());
         DecryptRequest decryptRequest = new DecryptRequest().withCiphertextBlob(encryptedKey);
