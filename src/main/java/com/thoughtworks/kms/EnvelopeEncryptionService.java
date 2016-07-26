@@ -41,7 +41,12 @@ public class EnvelopeEncryptionService
             NoSuchAlgorithmException, NoSuchPaddingException
     {
         if (isDataKeyEmpty()) {
-            return encryptMessageInSync(plainText);
+            synchronized (this) {
+                GenerateDataKeyResult generateDataKeyResult = generateDataKey();
+                dataKey = generateDataKeyResult.getPlaintext().array();
+                encryptedDataKey = generateDataKeyResult.getCiphertextBlob().array();
+                return encryptMessage(plainText);
+            }
         }
         return encryptMessage(plainText);
     }
@@ -51,18 +56,14 @@ public class EnvelopeEncryptionService
             NoSuchPaddingException, IllegalBlockSizeException, InvalidKeyException
     {
         if (isDataKeyChangedOrEmpty(envelopeEncryptedMessage)) {
-            return decryptMessageInSync(envelopeEncryptedMessage);
+            synchronized (this) {
+                DecryptResult decryptResult = decryptDataKey(envelopeEncryptedMessage);
+                dataKey = decryptResult.getPlaintext().array();
+                encryptedDataKey = envelopeEncryptedMessage.getEncryptedKey();
+                return decryptMessage(envelopeEncryptedMessage);
+            }
         }
         return decryptMessage(envelopeEncryptedMessage);
-    }
-
-    private synchronized EnvelopeEncryptedMessage encryptMessageInSync(String plainText) throws NoSuchPaddingException, NoSuchAlgorithmException,
-            InvalidKeyException, BadPaddingException, IllegalBlockSizeException
-    {
-        GenerateDataKeyResult generateDataKeyResult = generateDataKey();
-        dataKey = generateDataKeyResult.getPlaintext().array();
-        encryptedDataKey = generateDataKeyResult.getCiphertextBlob().array();
-        return encryptMessage(plainText);
     }
 
     private EnvelopeEncryptedMessage encryptMessage(String plainText) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
@@ -85,15 +86,6 @@ public class EnvelopeEncryptionService
         generateDataKeyRequest.setKeySpec(DataKeySpec.AES_128);
         return awskms.generateDataKey(generateDataKeyRequest);
 
-    }
-
-    private synchronized String decryptMessageInSync(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws InvalidKeyException,
-            NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException
-    {
-        DecryptResult decryptResult = decryptDataKey(envelopeEncryptedMessage);
-        dataKey = decryptResult.getPlaintext().array();
-        encryptedDataKey = envelopeEncryptedMessage.getEncryptedKey();
-        return decryptMessage(envelopeEncryptedMessage);
     }
 
 
