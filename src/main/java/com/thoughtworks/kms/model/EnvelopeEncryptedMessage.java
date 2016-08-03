@@ -1,4 +1,4 @@
-package com.thoughtworks.kms;
+package com.thoughtworks.kms.model;
 
 public final class EnvelopeEncryptedMessage
 {

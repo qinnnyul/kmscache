@@ -1,22 +1,13 @@
-package com.thoughtworks.kms;
+package com.thoughtworks.kms.service;
 
 import com.amazonaws.services.kms.AWSKMS;
-import com.amazonaws.services.kms.model.DataKeySpec;
-import com.amazonaws.services.kms.model.DecryptRequest;
-import com.amazonaws.services.kms.model.DecryptResult;
-import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
-import com.amazonaws.services.kms.model.GenerateDataKeyResult;
+import com.thoughtworks.kms.model.EnvelopeEncryptedMessage;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
 
 public class EnvelopeEncryptionService
 {

@@ -1,8 +1,9 @@
-package com.thoughtworks.kms;
+package com.thoughtworks.kms.service;
 
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
+import com.thoughtworks.kms.model.EnvelopeEncryptedMessage;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -16,7 +17,7 @@ import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.thoughtworks.kms.EnvelopeEncryptionService.AES;
+import static com.thoughtworks.kms.service.EnvelopeEncryptionService.AES;
 
 public class EnvelopeDecryption
 {
@@ -48,9 +49,9 @@ public class EnvelopeDecryption
     private String decryptMessage(EnvelopeEncryptedMessage envelopeEncryptedMessage) throws InvalidKeyException, NoSuchPaddingException,
             NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException
     {
-        byte[] decode = Base64.getDecoder().decode(envelopeEncryptedMessage.getEncryptedMessage());
         Cipher cipher = Cipher.getInstance(AES);
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(cacheKeys.get(new String(envelopeEncryptedMessage.getEncryptedKey())), AES));
+        byte[] decode = Base64.getDecoder().decode(envelopeEncryptedMessage.getEncryptedMessage());
         return new String(cipher.doFinal(decode));
     }
 
