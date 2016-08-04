@@ -1,19 +1,79 @@
 buildscript {
-	ext {
-		springBootVersion = '1.3.6.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
+    ext {
+        springBootVersion = '1.3.6.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
+plugins {
+    id 'net.researchgate.release' version '2.3.4'
+}
+
+apply plugin: 'maven-publish'
+
+
+/*------------------------
+----- PUBLISH PLUGIN -----
+--------------------------
+https://docs.gradle.org/current/userguide/publishing_maven.html
+--------------------------*/
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.thoughtworks.kms'
+            artifactId 'envelope'
+            version '0.0.5-SNAPSHOT'
+
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            if(project.version.endsWith('-SNAPSHOT')) {
+                url "/content/repositories/repo-snapshots"
+            } else {
+                url "/content/repositories/repo-releases"
+            }
+            credentials {
+                username ''
+                password ''
+            }
+        }
+    }
+}
+
+/*------------------------
+----- RELEASE PLUGIN -----
+--------------------------
+https://github.com/researchgate/gradle-release
+--------------------------*/
+release {
+    failOnCommitNeeded = false
+    failOnUnversionedFiles = false
+
+    scmAdapters = [
+            net.researchgate.release.SvnAdapter
+    ]
+}
+
+
+
+
 apply plugin: 'java'
+apply plugin: 'spring-boot'
 apply plugin: 'eclipse'
 
 jar {
 	baseName = 'envelope'
-	version = '0.0.1-SNAPSHOT'
+	version = '0.0.5-SNAPSHOT'
 }
+
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -23,6 +83,8 @@ repositories {
 
 
 dependencies {
+    compile('org.springframework.boot:spring-boot:1.3.6.RELEASE')
+    compile('org.springframework.boot:spring-boot-autoconfigure:1.3.6.RELEASE')
 	compile('com.amazonaws:aws-java-sdk-kms:1.11.19')
 	testCompile('junit:junit:4.12')
 }

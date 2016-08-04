@@ -1,5 +1,5 @@
 aws:
   kms:
     enable: true
-    region: ap-southeast-2
-    keyId: arn:aws:kms:ap-southeast-2:669606450274:key/b8b8f314-f55d-41e8-a8fe-b19a82f2201a
+    region: ap-southeast-1
+    keyId: arn:aws:kms:ap-southeast-1:669606450274:key/b8b8f314-f55d-41e8-a8fe-b19a82f2201a

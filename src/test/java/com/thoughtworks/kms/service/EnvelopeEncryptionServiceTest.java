@@ -1,10 +1,14 @@
-package com.thoughtworks.kms;
+package com.thoughtworks.kms.service;
 
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kms.AWSKMSClient;
+import com.thoughtworks.kms.model.EnvelopeEncryptedMessage;
+import com.thoughtworks.kms.service.EnvelopeEncryptionService;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -47,7 +51,7 @@ public class EnvelopeEncryptionServiceTest
         EnvelopeEncryptedMessage envelopeEncryptedMessage2 = classUnderTest.encrypt("sldjfsdald");
 
         // then
-        assertThat(new String(envelopeEncryptedMessage1.getEncryptedKey()).equals(new String(envelopeEncryptedMessage2.getEncryptedKey())), is(true));
+        assertTrue(Arrays.equals(envelopeEncryptedMessage1.getEncryptedKey(), envelopeEncryptedMessage2.getEncryptedKey()));
     }
 
     @Test
